@@ -48,3 +48,39 @@ const generateLift = (liftNo) => {
   newLift.textContent = liftNo;
   document.getElementById("container").lastElementChild.appendChild(newLift);
 };
+
+/**
+ * moveLift - this func moves the lift.
+ * @param {number} floorId
+ */
+const moveLift = (floorId) => {
+  const floorNo = floorId.split("-");
+  const liftId = liftSelector();
+  const lift = document.getElementById(liftId);
+
+  // Move the lift
+  lift.style.transform = `translateY(-${(Number(floorNo[1]) - 1) * 100}px)`;
+};
+
+// find the next lift and bring it.
+/**
+ *
+ * @returns
+ */
+
+const liftSelector = () => {
+  const allLifts = document.querySelectorAll(".lift");
+
+  if (allLifts.length > 0) {
+    if (i < allLifts.length - 1) {
+      i++;
+    } else {
+      i = 0;
+    }
+
+    return allLifts[i].id;
+  } else {
+    console.error("No lifts found.");
+    return null;
+  }
+};
