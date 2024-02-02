@@ -35,3 +35,11 @@ const generateFloor = (floorNos) => {
   newFloor.appendChild(floorBtnContainer);
   document.getElementById("container").append(newFloor);
 };
+
+const generateLift = (liftNos) => {
+  const newLift = document.createElement("div");
+  newLift.className = "lift";
+  newLift.id = `lift-${liftNos}`;
+  newLift.textContent = liftNos;
+  document.getElementById("container").lastElementChild.appendChild(newLift);
+};
