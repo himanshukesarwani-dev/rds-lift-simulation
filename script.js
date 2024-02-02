@@ -36,6 +36,11 @@ const generateFloor = (floorNos) => {
   document.getElementById("container").append(newFloor);
 };
 
+/**
+ * generateLift - takes a liftNo and creates a lift.
+ * @param {number} liftNo
+ */
+
 const generateLift = (liftNo) => {
   const newLift = document.createElement("div");
   newLift.className = "lift";
