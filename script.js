@@ -8,17 +8,17 @@ let i = -1;
 
 /**
  *generateFloor - generates a floor and returns it.
- * @param {number} floorNos
+ * @param {number} floorNo
  */
 
-const generateFloor = (floorNos) => {
+const generateFloor = (floorNo) => {
   const newFloor = document.createElement("div");
   const upBtn = document.createElement("button");
   const downBtn = document.createElement("button");
 
   newFloor.className = "floor";
-  newFloor.id = `floor-${floorNos}`;
-  newFloor.textContent = `Floor ${floorNos}`;
+  newFloor.id = `floor-${floorNo}`;
+  newFloor.textContent = `Floor ${floorNo}`;
 
   upBtn.textContent = "Up";
   downBtn.textContent = "Down";
@@ -28,8 +28,7 @@ const generateFloor = (floorNos) => {
   const floorBtnContainer = document.createElement("div");
   floorBtnContainer.className = "floor-btn-container";
   floorBtnContainer.append(upBtn, downBtn);
-  // const hr = document.createElement("hr");
-  // hr.className = "hr";
+
   upBtn.addEventListener("click", () => moveLift(newFloor.id));
   downBtn.addEventListener("click", () => moveLift(newFloor.id));
   newFloor.appendChild(floorBtnContainer);
