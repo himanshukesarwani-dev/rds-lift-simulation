@@ -117,6 +117,27 @@ const resetBtnHandler = () => {
 };
 
 /**
+ * Restart Btn Handler - This function generates a restart button.
+ * @returns restart button
+ */
+
+const restartBtnHandler = () => {
+  const restartBtn = generateBtn("Restart");
+
+  restartBtn.addEventListener("click", function () {
+    inputForm.style.display = "block";
+    document.getElementById("container").innerHTML = "";
+
+    const numberInputs = document.querySelectorAll('input[type="number"]');
+    numberInputs.forEach((input) => {
+      input.value = "";
+    });
+  });
+
+  return restartBtn;
+};
+
+/**
  * submitBtn is the main function that is called when the submit button is clicked.
  * It creates the no. of lifts, and no. of floors required.
  */
