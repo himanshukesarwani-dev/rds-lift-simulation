@@ -98,6 +98,25 @@ const generateBtn = (text) => {
 };
 
 /**
+ * resetBtnHandler - creates a button that will reset the lifts.
+ * @returns a button element that will reset the lifts.
+ */
+
+const resetBtnHandler = () => {
+  const resetBtn = generateBtn("Reset");
+
+  resetBtn.addEventListener("click", function () {
+    const allLifts = document.querySelectorAll(".lift");
+    i = -1;
+    allLifts.forEach((lift) => {
+      lift.style.transform = `translateY(0)`;
+    });
+  });
+
+  return resetBtn;
+};
+
+/**
  * submitBtn is the main function that is called when the submit button is clicked.
  * It creates the no. of lifts, and no. of floors required.
  */
