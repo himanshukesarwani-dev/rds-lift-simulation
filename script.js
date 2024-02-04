@@ -96,3 +96,51 @@ const generateBtn = (text) => {
   btn.classList.add("btn", "generate-btn", "bold-600");
   return btn;
 };
+
+/**
+ * submitBtn is the main function that is called when the submit button is clicked.
+ * It creates the no. of lifts, and no. of floors required.
+ */
+
+submitBtn.addEventListener("click", function (event) {
+  // to prevent default behaviour.
+  event.preventDefault();
+
+  if (+noOfFloors.value < 1 || +noOfLifts.value < 1) {
+    // validation
+    alert("Please enter a valid number");
+    return;
+  } else {
+    inputForm.style.display = "none";
+
+    // This will generate each floor.
+    for (let i = +noOfFloors.value; i > 0; i--) {
+      generateFloor(i);
+    }
+
+    // This will generate each lift.
+    for (let j = 1; j <= +noOfLifts.value; j++) {
+      generateLift(j);
+    }
+
+    const allFloors = document.querySelectorAll(".floor");
+
+    // display the first floor down btn and last floor up button to none.
+    allFloors[0].querySelector(".up-btn").style.display = "none";
+    allFloors[allFloors.length - 1].querySelector(".down-btn").style.display =
+      "none";
+
+    // This will reset the game and bring back lifts to the first floor.
+    const resetBtn = resetBtnHandler();
+
+    // This will restart the game.
+    const restartBtn = restartBtnHandler();
+
+    const btnContainer = document.createElement("div");
+    btnContainer.classList.add("btn-container");
+    btnContainer.append(restartBtn, resetBtn);
+
+    document.getElementById("container").appendChild(btnContainer);
+    btnContainer.style.textAlign = "center";
+  }
+});
