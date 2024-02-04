@@ -84,3 +84,15 @@ const liftSelector = () => {
     return null;
   }
 };
+
+/**
+ * generateBtn - It will generate a button with the text provided.
+ * @param {string} text
+ * @returns button element
+ */
+const generateBtn = (text) => {
+  const btn = document.createElement("button");
+  btn.textContent = text;
+  btn.classList.add("btn", "generate-btn", "bold-600");
+  return btn;
+};
