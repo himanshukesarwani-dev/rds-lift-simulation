@@ -64,8 +64,8 @@ const moveLift = (floorId) => {
 
 // find the next lift and bring it.
 /**
- *
- * @returns
+ * liftSelector - this function selects the next lift in the sequence.
+ * @returns a string of the id of the next lift.
  */
 
 const liftSelector = () => {
