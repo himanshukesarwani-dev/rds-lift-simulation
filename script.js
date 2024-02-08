@@ -28,7 +28,8 @@ const generateFloor = (floorNo) => {
   const floorBtnContainer = document.createElement("div");
   floorBtnContainer.className = "floor-btn-container";
   floorBtnContainer.append(upBtn, downBtn);
-
+  floorBtnContainer.style.position = "absolute";
+  floorBtnContainer.style.left = "70px";
   upBtn.addEventListener("click", () => moveLift(newFloor.id));
   downBtn.addEventListener("click", () => moveLift(newFloor.id));
   newFloor.appendChild(floorBtnContainer);
@@ -44,12 +45,20 @@ const generateLift = (liftNo) => {
   const newLift = document.createElement("div");
   newLift.className = "lift";
   newLift.id = `lift-${liftNo}`;
-  newLift.textContent = liftNo;
+
   document.getElementById("container").lastElementChild.appendChild(newLift);
+
+  // doors
+  const leftDoor = document.createElement("div");
+  const rightDoor = document.createElement("div");
+  leftDoor.className = "left-door";
+  rightDoor.className = "right-door";
+
+  newLift.append(leftDoor, rightDoor);
 };
 
 /**
- * moveLift - this func moves the lift.
+ * moveLift - this function moves the lift.
  * @param {number} floorId
  */
 const moveLift = (floorId) => {
@@ -57,8 +66,45 @@ const moveLift = (floorId) => {
   const liftId = liftSelector();
   const lift = document.getElementById(liftId);
 
-  // Move the lift
-  lift.style.transform = `translateY(-${(Number(floorNo[1]) - 1) * 100}px)`;
+  // Calculate the distance to move the lift. The floor is 100px height each.
+  const distance = (Number(floorNo[1]) - 1) * 100;
+
+  // Calculate the number of floors to move the lift.
+  const totalFloorsToMove = distance / 100;
+
+  // Calculate the duration for the lift to move 2s per floor.
+  const duration = 2000 * totalFloorsToMove;
+
+  // Move the lift using CSS transition
+  lift.style.transition = `transform ${duration}ms ease-in-out`;
+  lift.style.transform = `translateY(-${distance}px)`;
+
+  // Wait for the transition to end
+  lift.addEventListener("transitionend", () => {
+    openDoors(liftId);
+  });
+};
+
+/**
+ * openDoors - it opens the door of the lift whose Id is passed.
+ * @param {string} liftId
+ */
+
+const openDoors = (liftId) => {
+  document.getElementById(liftId).classList.add("open");
+
+  // Wait for the transition to end
+  document.getElementById(liftId).addEventListener("transitionend", () => {
+    closeDoors(liftId);
+  });
+};
+
+/**
+ * closeDoors - it closes the door of the lift whose id is passed.
+ * @param {string} liftId
+ */
+const closeDoors = (liftId) => {
+  document.getElementById(liftId).classList.remove("open");
 };
 
 // find the next lift and bring it.
