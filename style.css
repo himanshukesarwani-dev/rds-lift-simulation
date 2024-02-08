@@ -144,12 +144,46 @@ body {
   border: 2px solid darkgoldenrod;
   margin-left: 10px;
   margin-top: 5px;
-  transition: transform 2s ease-in-out;
+  position: relative;
+  padding: 0;
+  overflow: hidden;
 }
 
 #lift-1 {
   margin-left: 100px;
 }
+
+/* Doors */
+
+.left-door,
+.right-door {
+  background-color: #fff6e9;
+  width: 50%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  transition: transform 2.5s ease-in-out;
+}
+
+.left-door {
+  transform-origin: right;
+  left: 0;
+}
+
+.right-door {
+  transform-origin: left;
+  right: 0;
+}
+
+/* Select the .left-door when the lift class also has open class.*/
+.lift.open .left-door {
+  transform: translateX(-100%);
+}
+
+.lift.open .right-door {
+  transform: translateX(100%);
+}
+
 /* floor */
 
 .floor {
@@ -179,7 +213,12 @@ footer {
   text-align: center;
 }
 
-footer a {
+.portfolio-link {
   color: var(--primary-color);
   text-decoration: none;
+}
+
+.github-img {
+  width: 15px;
+  margin-left: 5px;
 }
