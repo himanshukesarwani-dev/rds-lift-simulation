@@ -188,6 +188,18 @@ const restartBtnHandler = () => {
 submitBtn.addEventListener("click", function (event) {
   // Prevent default behavior.
   event.preventDefault();
+  // Reset the game and bring back lifts to the first floor.
+  const resetBtn = resetBtnHandler();
+
+  // Restart the game.
+  const restartBtn = restartBtnHandler();
+
+  const btnContainer = document.createElement("div");
+  btnContainer.classList.add("btn-container");
+  btnContainer.append(restartBtn, resetBtn);
+
+  document.getElementById("container").appendChild(btnContainer);
+  btnContainer.style.textAlign = "center";
 
   if (+noOfFloors.value < 1 || +noOfLifts.value < 1) {
     // Validation
@@ -212,18 +224,5 @@ submitBtn.addEventListener("click", function (event) {
     allFloors[0].querySelector(".up-btn").style.display = "none";
     allFloors[allFloors.length - 1].querySelector(".down-btn").style.display =
       "none";
-
-    // Reset the game and bring back lifts to the first floor.
-    const resetBtn = resetBtnHandler();
-
-    // Restart the game.
-    const restartBtn = restartBtnHandler();
-
-    const btnContainer = document.createElement("div");
-    btnContainer.classList.add("btn-container");
-    btnContainer.append(restartBtn, resetBtn);
-
-    document.getElementById("container").appendChild(btnContainer);
-    btnContainer.style.textAlign = "center";
   }
 });
