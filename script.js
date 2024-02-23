@@ -3,10 +3,8 @@ const noOfFloors = document.querySelector("#floors");
 const submitBtn = document.querySelector("#submit-btn");
 const inputForm = document.querySelector(".input-form");
 let i = -1;
-const liftQueue = [];
 
-// Lift status object to track which lift is serving each floor
-const liftStatus = {};
+const allLiftsArray = [];
 
 // floor generator.
 const generateFloor = (floorNo) => {
@@ -30,11 +28,11 @@ const generateFloor = (floorNo) => {
   floorBtnContainer.style.left = "70px";
 
   upBtn.addEventListener("click", () => {
-    addRequest(floorNo, "up");
+    getClosestLift(floorNo);
   });
 
   downBtn.addEventListener("click", () => {
-    addRequest(floorNo, "down");
+    getClosestLift(floorNo);
   });
 
   newFloor.appendChild(floorBtnContainer);
@@ -55,7 +53,36 @@ const generateLift = (liftNo) => {
   leftDoor.className = "left-door";
   rightDoor.className = "right-door";
 
+  allLiftsArray.push({ element: newLift, currentFloor: 1, isBusy: false });
+
   newLift.append(leftDoor, rightDoor);
+};
+
+// get lifts
+const getAllLifts = () => allLiftsArray;
+
+// get closest lift + not busy
+const getClosestLift = (destinationFloor) => {
+  console.log(destinationFloor);
+  const lifts = getAllLifts();
+  let minDistance = Number(noOfFloors.value) + 1;
+  let closestLift;
+
+  // find the closest lift.
+  for (let i = 0; i < lifts.length; i++) {
+    if (!lifts[i].isBusy) {
+      if (Math.abs(lifts[i].currentFloor - destinationFloor) < minDistance) {
+        minDistance = Math.abs(lifts[i].currentFloor - destinationFloor);
+        closestLift = lifts[i];
+      }
+    }
+  }
+  if (closestLift) {
+    closestLift.isBusy = true;
+    moveLift(destinationFloor, closestLift.element.id);
+  } else {
+    console.log("All lifts are busy as of now.");
+  }
 };
 
 // Moves the lift.
@@ -75,73 +102,38 @@ const moveLift = (floorNo, liftId) => {
   lift.style.transition = `transform ${duration}ms ease-in-out`;
   lift.style.transform = `translateY(-${distance}px)`;
 
+  // console.log(allLiftsArray);
   // Wait for the transition to end
   lift.addEventListener("transitionend", () => {
-    openDoors(floorNo, liftId);
+    openDoors(liftId, floorNo);
   });
-
-  // Update lift status
-  liftStatus[floorNo] = liftId;
 };
 
 // Opens the doors of the lift.
-const openDoors = (floorNo, liftId) => {
+const openDoors = (liftId, floorNo) => {
   document.getElementById(liftId).classList.add("open");
 
   // Wait for the transition to end
   document.getElementById(liftId).addEventListener("transitionend", () => {
-    closeDoors(liftId);
+    closeDoors(liftId, floorNo);
   });
-
-  // If there is a request in the queue for the same floor and direction, call the lift again
-  callLift(floorNo);
 };
 
 // Closes the doors of the lift.
-const closeDoors = (liftId) => {
+const closeDoors = (liftId, floorNo) => {
   document.getElementById(liftId).classList.remove("open");
-};
-
-// Adds a new request to the lift queue.
-const addRequest = (floorNo, direction) => {
-  if (direction === "up" && liftStatus[floorNo]) {
-    // If a lift is already serving this floor, open its doors
-    openDoors(floorNo, liftStatus[floorNo]);
-  } else if (direction === "down" && liftStatus[floorNo]) {
-    // If a lift is already serving this floor, open its doors
-    openDoors(floorNo, liftStatus[floorNo]);
-  } else {
-    // Otherwise, add a new request to the queue
-    liftQueue.push({ floor: floorNo, direction });
-    callLift(floorNo);
-  }
-};
-
-// Calls a lift to serve the next request in the queue.
-const callLift = (floorNo) => {
-  if (liftQueue.length > 0) {
-    const { floor, direction } = liftQueue.shift();
-    const liftId = liftSelector();
-    moveLift(floor, liftId);
-  }
-};
-
-// Selects the next lift in the sequence.
-const liftSelector = () => {
-  const allLifts = document.querySelectorAll(".lift");
-
-  if (allLifts.length > 0) {
-    if (i < allLifts.length - 1) {
-      i++;
+  setTimeout(() => {
+    const selectedLiftIndex = allLiftsArray.findIndex(
+      (lift) => lift.element.id === liftId
+    );
+    if (selectedLiftIndex !== -1) {
+      allLiftsArray[selectedLiftIndex].isBusy = false;
+      allLiftsArray[selectedLiftIndex].currentFloor = floorNo;
+      console.log(allLiftsArray);
     } else {
-      i = 0;
+      console.log("Lift not found in the array.");
     }
-
-    return allLifts[i].id;
-  } else {
-    console.error("No lifts found.");
-    return null;
-  }
+  }, 2500);
 };
 
 // Generates a button with the text provided.
@@ -188,6 +180,17 @@ const restartBtnHandler = () => {
 submitBtn.addEventListener("click", function (event) {
   // Prevent default behavior.
   event.preventDefault();
+  const resetBtn = resetBtnHandler();
+
+  // Restart the game.
+  const restartBtn = restartBtnHandler();
+
+  const btnContainer = document.createElement("div");
+  btnContainer.classList.add("btn-container");
+  btnContainer.append(restartBtn, resetBtn);
+
+  document.getElementById("container").appendChild(btnContainer);
+  btnContainer.style.textAlign = "center";
 
   if (+noOfFloors.value < 1 || +noOfLifts.value < 1) {
     // Validation
@@ -214,16 +217,5 @@ submitBtn.addEventListener("click", function (event) {
       "none";
 
     // Reset the game and bring back lifts to the first floor.
-    const resetBtn = resetBtnHandler();
-
-    // Restart the game.
-    const restartBtn = restartBtnHandler();
-
-    const btnContainer = document.createElement("div");
-    btnContainer.classList.add("btn-container");
-    btnContainer.append(restartBtn, resetBtn);
-
-    document.getElementById("container").appendChild(btnContainer);
-    btnContainer.style.textAlign = "center";
   }
 });
