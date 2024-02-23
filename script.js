@@ -88,7 +88,6 @@ const getClosestLift = (destinationFloor) => {
 const moveLift = (floorNo, liftId) => {
   const lift = document.getElementById(liftId);
 
-
   // Calculate the distance to move the lift. The floor is 100px height each.
   const distance = (floorNo - 1) * 100;
 
@@ -156,6 +155,7 @@ const resetBtnHandler = () => {
     });
     return resetBtn;
   });
+};
 // Generates a restart button.
 const restartBtnHandler = () => {
   const restartBtn = generateBtn("Restart");
