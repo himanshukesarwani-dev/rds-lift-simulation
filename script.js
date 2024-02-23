@@ -4,6 +4,67 @@ const submitBtn = document.querySelector("#submit-btn");
 const inputForm = document.querySelector(".input-form");
 
 const allLiftsArray = [];
+// const liftRequests = [];
+
+class LiftQueue {
+  constructor() {
+    this.activeRequests = [];
+    this.processingRequests = [];
+  }
+  add(destinationFloor, direction) {
+    this.activeRequests.push({ destinationFloor, direction });
+  }
+  remove() {
+    const removedReq = this.activeRequests.shift();
+    this.processingRequests.push(removedReq);
+    return removedReq;
+  }
+  top() {
+    if (this.activeRequests.length > 0) {
+      return this.activeRequests[0];
+    }
+  }
+  removeFromProcessing() {
+    const removedReq = this.processingRequests.shift();
+    return removedReq;
+  }
+}
+
+const allRequestsQueue = new LiftQueue();
+
+const processHandler = (destinationFloor, direction) => {
+  // check whether a request already exists in activeRequests and processingRequest
+
+  const reqInActiveQueue = allRequestsQueue.activeRequests.find(
+    (req) =>
+      req.destinationFloor === destinationFloor && req.direction === direction
+  );
+
+  const reqInProcessingQueue = allRequestsQueue.processingRequests.find(
+    (req) =>
+      req.destinationFloor === destinationFloor && req.direction === direction
+  );
+
+  console.log("reqInActiveQueue", reqInActiveQueue);
+  console.log("reqInProcessingQueue", reqInProcessingQueue);
+
+  // if it doesnt add that request in the array.
+  if (!reqInActiveQueue && !reqInProcessingQueue) {
+    console.log("request doesn't exist");
+
+    allRequestsQueue.add(destinationFloor, direction);
+    console.log(allRequestsQueue);
+
+    // const topRequest = allRequestsQueue.top();
+    // console.log("topRequest", topRequest);
+    const requestToSendToProcessing = allRequestsQueue.remove();
+
+    getClosestLift(
+      requestToSendToProcessing.destinationFloor,
+      requestToSendToProcessing.direction
+    );
+  }
+};
 
 // floor generator.
 const generateFloor = (destinationFloor) => {
@@ -27,13 +88,15 @@ const generateFloor = (destinationFloor) => {
   floorBtnContainer.style.left = "70px";
 
   upBtn.addEventListener("click", () => {
-    getClosestLift(destinationFloor, "up");
+    processHandler(destinationFloor, "up");
+    //  getClosestLift(destinationFloor, "up");
     console.log("destination Floor", destinationFloor);
   });
 
   downBtn.addEventListener("click", () => {
-    getClosestLift(destinationFloor, "down");
-    console.log("destination Floor", destinationFloor);
+    processHandler(destinationFloor, "down");
+    //getClosestLift(destinationFloor, "down");
+    //  console.log("destination Floor", destinationFloor);
   });
 
   newFloor.appendChild(floorBtnContainer);
@@ -66,6 +129,7 @@ const generateLift = (liftNo) => {
 
 // get closest lift + not busy
 const getClosestLift = (destinationFloor, direction) => {
+  // debugger;
   let minDistance = Number(noOfFloors.value) + 1;
   let closestLiftIndex = -1;
 
@@ -86,20 +150,17 @@ const getClosestLift = (destinationFloor, direction) => {
   } else {
     console.log("All lifts are busy as of now.");
   }
-  console.log("allLiftsArray", allLiftsArray);
 };
 
 // Moves the lift.
 const moveLift = (destinationFloor, closestLiftIndex) => {
   // const lift = document.getElementById(liftId);
   const lift = allLiftsArray[closestLiftIndex].element;
-  console.log("selected lift: ", lift);
 
   const totalDistance = Math.abs(
     destinationFloor - allLiftsArray[closestLiftIndex].currentFloor
   );
   const totalTime = totalDistance * 2000;
-  console.log((destinationFloor - 1) * 100 * -1);
 
   lift.style.transform = `translateY(${(destinationFloor - 1) * 100 * -1}px)`;
   lift.style.transition = `transform ${totalTime}ms ease-in-out`;
@@ -116,7 +177,6 @@ const openDoors = (closestLiftIndex, destinationFloor) => {
   allLiftsArray[closestLiftIndex].element.classList.add("open");
 
   setTimeout(() => {
-    console.log("this is after the lift has arrived its destination.");
     closeDoors(closestLiftIndex, destinationFloor);
   }, 2500);
 };
@@ -128,6 +188,8 @@ const closeDoors = (closestLiftIndex, destinationFloor) => {
     allLiftsArray[closestLiftIndex].isBusy = false;
     allLiftsArray[closestLiftIndex].currentFloor = destinationFloor;
     console.log("allLiftsArray after doors closing.", allLiftsArray);
+    allRequestsQueue.removeFromProcessing();
+    console.log("allRequestsQueue after doors closing.", allRequestsQueue);
   }, 2500);
 };
 
