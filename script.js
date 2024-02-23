@@ -6,14 +6,14 @@ const inputForm = document.querySelector(".input-form");
 const allLiftsArray = [];
 
 // floor generator.
-const generateFloor = (floorNo) => {
+const generateFloor = (destinationFloor) => {
   const newFloor = document.createElement("div");
   const upBtn = document.createElement("button");
   const downBtn = document.createElement("button");
 
   newFloor.className = "floor";
-  newFloor.id = `floor-${floorNo}`;
-  newFloor.textContent = `Floor ${floorNo}`;
+  newFloor.id = `floor-${destinationFloor}`;
+  newFloor.textContent = `Floor ${destinationFloor}`;
 
   upBtn.textContent = "Up";
   downBtn.textContent = "Down";
@@ -27,11 +27,13 @@ const generateFloor = (floorNo) => {
   floorBtnContainer.style.left = "70px";
 
   upBtn.addEventListener("click", () => {
-    getClosestLift(floorNo);
+    getClosestLift(destinationFloor, "up");
+    console.log("destination Floor", destinationFloor);
   });
 
   downBtn.addEventListener("click", () => {
-    getClosestLift(floorNo);
+    getClosestLift(destinationFloor, "down");
+    console.log("destination Floor", destinationFloor);
   });
 
   newFloor.appendChild(floorBtnContainer);
@@ -52,15 +54,20 @@ const generateLift = (liftNo) => {
   leftDoor.className = "left-door";
   rightDoor.className = "right-door";
 
-  allLiftsArray.push({ element: newLift, currentFloor: 1, isBusy: false });
+  allLiftsArray.push({
+    element: newLift,
+    currentFloor: 1,
+    isBusy: false,
+    direction: "",
+  });
 
   newLift.append(leftDoor, rightDoor);
 };
 
 // get closest lift + not busy
-const getClosestLift = (destinationFloor) => {
+const getClosestLift = (destinationFloor, direction) => {
   let minDistance = Number(noOfFloors.value) + 1;
-  let closestLiftIndex;
+  let closestLiftIndex = -1;
 
   // find the closest lift.
   for (let i = 0; i < allLiftsArray.length; i++) {
@@ -69,15 +76,13 @@ const getClosestLift = (destinationFloor) => {
       if (dis < minDistance) {
         minDistance = dis;
         closestLiftIndex = i;
-        console.log("closestLiftIndex", closestLiftIndex);
       }
     }
   }
-  if (allLiftsArray[closestLiftIndex]) {
+  if (closestLiftIndex >= 0) {
     allLiftsArray[closestLiftIndex].isBusy = true;
-    console.log("destination floor", destinationFloor);
-
-    moveLift(destinationFloor, allLiftsArray[closestLiftIndex].element.id);
+    allLiftsArray[closestLiftIndex].direction = direction;
+    moveLift(destinationFloor, closestLiftIndex);
   } else {
     console.log("All lifts are busy as of now.");
   }
@@ -85,53 +90,44 @@ const getClosestLift = (destinationFloor) => {
 };
 
 // Moves the lift.
-const moveLift = (floorNo, liftId) => {
-  const lift = document.getElementById(liftId);
+const moveLift = (destinationFloor, closestLiftIndex) => {
+  // const lift = document.getElementById(liftId);
+  const lift = allLiftsArray[closestLiftIndex].element;
+  console.log("selected lift: ", lift);
 
-  // Calculate the distance to move the lift. The floor is 100px height each.
-  const distance = (floorNo - 1) * 100;
+  const totalDistance = Math.abs(
+    destinationFloor - allLiftsArray[closestLiftIndex].currentFloor
+  );
+  const totalTime = totalDistance * 2000;
+  console.log((destinationFloor - 1) * 100 * -1);
 
-  // Calculate the number of floors to move the lift.
-  const totalFloorsToMove = distance / 100;
-
-  // Calculate the duration for the lift to move 2s per floor.
-  const duration = 2000 * totalFloorsToMove;
-
-  // Move the lift using CSS transition
-  lift.style.transition = `transform ${duration}ms ease-in-out`;
-  lift.style.transform = `translateY(-${distance}px)`;
+  lift.style.transform = `translateY(${(destinationFloor - 1) * 100 * -1}px)`;
+  lift.style.transition = `transform ${totalTime}ms ease-in-out`;
 
   setTimeout(() => {
     setTimeout(() => {
-      openDoors(liftId, floorNo);
+      openDoors(closestLiftIndex, destinationFloor);
     });
-  }, duration);
+  }, totalTime);
 };
 
 // Opens the doors of the lift.
-const openDoors = (liftId, floorNo) => {
-  document.getElementById(liftId).classList.add("open");
+const openDoors = (closestLiftIndex, destinationFloor) => {
+  allLiftsArray[closestLiftIndex].element.classList.add("open");
 
   setTimeout(() => {
     console.log("this is after the lift has arrived its destination.");
-    closeDoors(liftId, floorNo);
+    closeDoors(closestLiftIndex, destinationFloor);
   }, 2500);
 };
 
 // Closes the doors of the lift.
-const closeDoors = (liftId, floorNo) => {
-  document.getElementById(liftId).classList.remove("open");
+const closeDoors = (closestLiftIndex, destinationFloor) => {
+  allLiftsArray[closestLiftIndex].element.classList.remove("open");
   setTimeout(() => {
-    const selectedLiftIndex = allLiftsArray.findIndex(
-      (lift) => lift.element.id === liftId
-    );
-    if (selectedLiftIndex !== -1) {
-      allLiftsArray[selectedLiftIndex].isBusy = false;
-      allLiftsArray[selectedLiftIndex].currentFloor = floorNo;
-      console.log("allLiftsArray after doors closing.", allLiftsArray);
-    } else {
-      console.log("Lift not found in the array.");
-    }
+    allLiftsArray[closestLiftIndex].isBusy = false;
+    allLiftsArray[closestLiftIndex].currentFloor = destinationFloor;
+    console.log("allLiftsArray after doors closing.", allLiftsArray);
   }, 2500);
 };
 
@@ -153,8 +149,9 @@ const resetBtnHandler = () => {
     allLifts.forEach((lift) => {
       lift.style.transform = `translateY(0)`;
     });
-    return resetBtn;
   });
+
+  return resetBtn;
 };
 // Generates a restart button.
 const restartBtnHandler = () => {
