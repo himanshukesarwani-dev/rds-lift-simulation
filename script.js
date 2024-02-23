@@ -2,7 +2,6 @@ const noOfLifts = document.querySelector("#lifts");
 const noOfFloors = document.querySelector("#floors");
 const submitBtn = document.querySelector("#submit-btn");
 const inputForm = document.querySelector(".input-form");
-let i = -1;
 
 const allLiftsArray = [];
 
@@ -89,6 +88,7 @@ const getClosestLift = (destinationFloor) => {
 const moveLift = (floorNo, liftId) => {
   const lift = document.getElementById(liftId);
 
+
   // Calculate the distance to move the lift. The floor is 100px height each.
   const distance = (floorNo - 1) * 100;
 
@@ -102,22 +102,21 @@ const moveLift = (floorNo, liftId) => {
   lift.style.transition = `transform ${duration}ms ease-in-out`;
   lift.style.transform = `translateY(-${distance}px)`;
 
-  // console.log(allLiftsArray);
-  // Wait for the transition to end
-  lift.addEventListener("transitionend", () => {
-    openDoors(liftId, floorNo);
-  });
+  setTimeout(() => {
+    setTimeout(() => {
+      openDoors(liftId, floorNo);
+    });
+  }, duration);
 };
 
 // Opens the doors of the lift.
 const openDoors = (liftId, floorNo) => {
   document.getElementById(liftId).classList.add("open");
 
-  // Wait for the transition to end
-  document.getElementById(liftId).addEventListener("transitionend", () => {
-    console.log("this is done after the doors have been opened");
+  setTimeout(() => {
+    console.log("this is after the lift has arrived its destination.");
     closeDoors(liftId, floorNo);
-  });
+  }, 2500);
 };
 
 // Closes the doors of the lift.
@@ -155,11 +154,8 @@ const resetBtnHandler = () => {
     allLifts.forEach((lift) => {
       lift.style.transform = `translateY(0)`;
     });
+    return resetBtn;
   });
-
-  return resetBtn;
-};
-
 // Generates a restart button.
 const restartBtnHandler = () => {
   const restartBtn = generateBtn("Restart");
