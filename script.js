@@ -58,31 +58,31 @@ const generateLift = (liftNo) => {
   newLift.append(leftDoor, rightDoor);
 };
 
-// get lifts
-const getAllLifts = () => allLiftsArray;
-
 // get closest lift + not busy
 const getClosestLift = (destinationFloor) => {
-  console.log(destinationFloor);
-  const lifts = getAllLifts();
   let minDistance = Number(noOfFloors.value) + 1;
-  let closestLift;
+  let closestLiftIndex;
 
   // find the closest lift.
-  for (let i = 0; i < lifts.length; i++) {
-    if (!lifts[i].isBusy) {
-      if (Math.abs(lifts[i].currentFloor - destinationFloor) < minDistance) {
-        minDistance = Math.abs(lifts[i].currentFloor - destinationFloor);
-        closestLift = lifts[i];
+  for (let i = 0; i < allLiftsArray.length; i++) {
+    if (!allLiftsArray[i].isBusy) {
+      let dis = Math.abs(allLiftsArray[i].currentFloor - destinationFloor);
+      if (dis < minDistance) {
+        minDistance = dis;
+        closestLiftIndex = i;
+        console.log("closestLiftIndex", closestLiftIndex);
       }
     }
   }
-  if (closestLift) {
-    closestLift.isBusy = true;
-    moveLift(destinationFloor, closestLift.element.id);
+  if (allLiftsArray[closestLiftIndex]) {
+    allLiftsArray[closestLiftIndex].isBusy = true;
+    console.log("destination floor", destinationFloor);
+
+    moveLift(destinationFloor, allLiftsArray[closestLiftIndex].element.id);
   } else {
     console.log("All lifts are busy as of now.");
   }
+  console.log("allLiftsArray", allLiftsArray);
 };
 
 // Moves the lift.
@@ -115,6 +115,7 @@ const openDoors = (liftId, floorNo) => {
 
   // Wait for the transition to end
   document.getElementById(liftId).addEventListener("transitionend", () => {
+    console.log("this is done after the doors have been opened");
     closeDoors(liftId, floorNo);
   });
 };
@@ -129,7 +130,7 @@ const closeDoors = (liftId, floorNo) => {
     if (selectedLiftIndex !== -1) {
       allLiftsArray[selectedLiftIndex].isBusy = false;
       allLiftsArray[selectedLiftIndex].currentFloor = floorNo;
-      console.log(allLiftsArray);
+      console.log("allLiftsArray after doors closing.", allLiftsArray);
     } else {
       console.log("Lift not found in the array.");
     }
